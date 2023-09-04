@@ -165,7 +165,7 @@ class Clan implements JsonSerializable
         $tim = Tim::toEntity($row);
         $level = Level::toEntity($row);
 
-        return new Clan($row['clan_id'], $row['ime_prezime'], $row['datum_rodjenja'], $row['broj_telefona'], $row['ocena'], $tim , $level);
+        return new Clan($row['id'], $row['imePrezime'], $row['datumRodjenja'], $row['brojTelefona'], $row['ocenaRada'], $tim , $level);
     }
 
 }

@@ -37,7 +37,7 @@ class DbConnection
     }
 
     public function pretraziClanove($pretraga, $sort){
-        $sql = "SELECT * FROM clan c JOIN tim t ON c.tim_id = t.tim_id JOIN level l ON c.level_id = l.level_id WHERE c.ime_prezime LIKE '%$pretraga%' ORDER BY $sort";
+        $sql = "SELECT * FROM clan c JOIN tim t ON c.tim_id = t.tim_id JOIN level l ON c.level_id = l.level_id WHERE c.imePrezime LIKE '%$pretraga%' ORDER BY $sort";
         $rezultat = $this->izvrsiUpit($sql);
         $clanovi = [];
         while ($red = $rezultat->fetch_assoc()) {

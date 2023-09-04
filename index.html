@@ -19,40 +19,77 @@
 
                         <div class="row">
                             <div class="col-xl-3 col-md-6">
-                                <div class="card bg-primary text-white mb-4">
-                                    <div class="card-body">Primary Card</div>
+                                <div class="card bg-success text-white mb-4">
+                                    <div class="card-body">Najbolji radnici</div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                        <ul id="najboljiRadnici">
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-primary text-white mb-4">
+                                    <div class="card-body">Odlicni radnici</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <ul id="odlicniRadnici">
+
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-3 col-md-6">
                                 <div class="card bg-warning text-white mb-4">
-                                    <div class="card-body">Warning Card</div>
+                                    <div class="card-body">Prosecni radnici</div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">Success Card</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                        <ul id="prosecniRadnici">
+
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-3 col-md-6">
                                 <div class="card bg-danger text-white mb-4">
-                                    <div class="card-body">Danger Card</div>
+                                    <div class="card-body">Losi radnici</div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                        <ul id="losiRadnici">
+
+                                        </ul>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label for="pretraga">Pretrazi po imenu i prezimenu radnika</label>
+                                <input type="text" class="form-control" id="pretraga" placeholder="Unesite ime i prezime radnika">
+                                <label for="sort">Sortiraj po:</label>
+                                <select class="form-control" id="sort">
+                                    <option value=" c.imePrezime asc">Imenu i prezimenu rastuce</option>
+                                    <option value=" c.imePrezime desc">Imenu i prezimenu opadajuce</option>
+                                    <option value=" c.ocenaRada asc">Oceni rastuce</option>
+                                    <option value=" c.ocenaRada desc">Oceni opadajuce</option>
+                                </select>
+                                <hr>
+                                <button class="btn btn-primary" onclick="pretrazi()" id="btnPretrazi">Pretrazi</button>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>#ID</th>
+                                            <th>Ime i prezime</th>
+                                            <th>Datum rodjenja</th>
+                                            <th>Broj telefona</th>
+                                            <th>Ocena</th>
+                                            <th>Tim</th>
+                                            <th>Level</th>
+                                            <th>Obrisi clana</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabela">
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -68,5 +105,74 @@
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/jquery.js"></script>
+
+        <script>
+            function popuniKarticeClanovima(){
+                $.ajax({
+                    url: 'vratiSveRadnike.php',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data){
+                        console.log(data);
+
+                        let podaci = JSON.parse(JSON.stringify(data));
+
+                        for (let i = 0; i < podaci.length; i++) {
+                            if (podaci[i].ocena >= 9){
+                                $("#najboljiRadnici").append("<li>" + podaci[i].imePrezime + "</li>")
+                            }
+
+                            if (podaci[i].ocena >= 6 && podaci[i].ocena < 9){
+                                $("#odlicniRadnici").append("<li>" + podaci[i].imePrezime  + "</li>")
+                            }
+
+                            if (podaci[i].ocena >= 3 && podaci[i].ocena < 6){
+                                $("#prosecniRadnici").append("<li>" + podaci[i].imePrezime + "</li>")
+                            }
+
+                            if (podaci[i].ocena < 3){
+                                $("#losiRadnici").append("<li>" + podaci[i].imePrezime + "</li>")
+                            }
+                        }
+                    }
+                })
+            }
+
+            function pretrazi(){
+                $.ajax({
+                    url: 'pretrazi.php',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: {
+                        pretraga: $("#pretraga").val(),
+                        sort: $("#sort").val()
+                    },
+                    success: function (data){
+                        let podaci = JSON.parse(JSON.stringify(data));
+
+                        let mapiraniPodaci = podaci.map(function (podatak){
+                            return `<tr>
+                                        <td>${podatak.clanId}</td>
+                                        <td>${podatak.imePrezime}</td>
+                                        <td>${podatak.datumRodjenja}</td>
+                                        <td>${podatak.brojTelefona}</td>
+                                        <td>${podatak.ocena}</td>
+                                        <td>${podatak.tim.nazivTima}</td>
+                                        <td>${podatak.level.nazivLevela}</td>
+                                        <td><button class="btn btn-danger" onclick="obrisi(${podatak.id})">Obrisi</button></td>
+                                    </tr>`
+                        })
+
+                        $("#tabela").html(mapiraniPodaci);
+                    }
+
+                })
+            }
+
+            $(document).ready(function (){
+                popuniKarticeClanovima();
+            })
+
+        </script>
     </body>
 </html>
