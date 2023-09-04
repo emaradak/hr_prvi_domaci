@@ -23,16 +23,16 @@ class DbConnection
         $columns = implode(", ", array_keys($data));
         $values = implode("', '", array_values($data));
         $sql = "INSERT INTO $table ($columns) VALUES ('$values')";
-        $this->izvrsiUpit($sql);
+        return $this->izvrsiUpit($sql);
     }
 
     public function promeniOcenuClana($clanId, $ocena){
-        $sql = "UPDATE clan SET ocena = $ocena WHERE clan_id = $clanId";
+        $sql = "UPDATE clan SET ocenaRada = $ocena WHERE id = $clanId";
         $this->izvrsiUpit($sql);
     }
 
     public function izbrisiClana($clanId){
-        $sql = "DELETE FROM clan WHERE clan_id = $clanId";
+        $sql = "DELETE FROM clan WHERE id = $clanId";
         $this->izvrsiUpit($sql);
     }
 

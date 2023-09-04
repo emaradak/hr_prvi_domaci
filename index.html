@@ -92,6 +92,40 @@
                                 </table>
                             </div>
                         </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <h3>Unesi novog radnika</h3>
+                                <label for="imePrezime">Ime prezime radnika</label>
+                                <input type="text" class="form-control" id="imePrezime">
+                                <label for="datumRodjenja">Datum rodjenja(yyyy-mm-dd)</label>
+                                <input type="text" class="form-control" id="datumRodjenja">
+                                <label for="brojTelefona">Broj telefona</label>
+                                <input type="text" class="form-control" id="brojTelefona">
+                                <label for="ocena">Ocena</label>
+                                <input type="number" class="form-control" id="ocena">
+                                <label for="tim">Tim</label>
+                                <select class="form-control" id="tim">
+
+                                </select>
+                                <label for="level">Level</label>
+                                <select class="form-control" id="level">
+                                </select>
+                                <hr>
+                                <button class="btn btn-primary" onclick="unesi()" id="btnUnesi">Unesi radnika</button>
+
+                            </div>
+                            <div class="col-md-6">
+                                <h3>Izmeni ocenu radnika</h3>
+                                <label for="radnikIzmena" class="form-label">Radnik</label>
+                                <select class="form-control" id="radnikIzmena">
+                                </select>
+                                <label for="ocenaIzmena">Ocena</label>
+                                <input type="number" class="form-control" id="ocenaIzmena">
+                                <hr>
+                                <button class="btn btn-primary" onclick="izmeni()" id="btnIzmeni">Izmeni ocenu</button>
+                            </div>
+                        </div>
                     </div>
                 </main>
                 <footer class="py-4 bg-light mt-auto">
@@ -114,6 +148,12 @@
                     dataType: 'json',
                     success: function (data){
                         console.log(data);
+
+                        $("#najboljiRadnici").html("");
+                        $("#odlicniRadnici").html("");
+                        $("#prosecniRadnici").html("");
+                        $("#losiRadnici").html("");
+
 
                         let podaci = JSON.parse(JSON.stringify(data));
 
@@ -159,7 +199,7 @@
                                         <td>${podatak.ocena}</td>
                                         <td>${podatak.tim.nazivTima}</td>
                                         <td>${podatak.level.nazivLevela}</td>
-                                        <td><button class="btn btn-danger" onclick="obrisi(${podatak.id})">Obrisi</button></td>
+                                        <td><button class="btn btn-danger" onclick="obrisi(${podatak.clanId})">Obrisi</button></td>
                                     </tr>`
                         })
 
@@ -169,8 +209,118 @@
                 })
             }
 
+            function obrisi(id){
+
+                $.ajax({
+                    url: 'obrisiRadnika.php',
+                    method: 'GET',
+                    data: {
+                        id: id
+                    },
+                    success: function (data){
+                        alert(data);
+                        pretrazi();
+                        popuniSelectRadnika();
+                        popuniKarticeClanovima();
+                    }
+                })
+            }
+
+            function popuniSelectTimova(){
+                $.ajax({
+                    url: 'vratiTimove.php',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data){
+                        let podaci = JSON.parse(JSON.stringify(data));
+
+                        let mapiraniPodaci = podaci.map(function (podatak){
+                            return `<option value="${podatak.timId}">${podatak.nazivTima}</option>`
+                        })
+
+                        $("#tim").html(mapiraniPodaci);
+                    }
+                })
+            }
+
+            function popuniSelectLevela(){
+                $.ajax({
+                    url: 'vratiLevele.php',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data){
+                        let podaci = JSON.parse(JSON.stringify(data));
+
+                        let mapiraniPodaci = podaci.map(function (podatak){
+                            return `<option value="${podatak.levelId}">${podatak.nazivLevela}</option>`
+                        })
+
+                        $("#level").html(mapiraniPodaci);
+                    }
+                })
+            }
+
+            function popuniSelectRadnika(){
+                $.ajax({
+                    url: 'vratiSveRadnike.php',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data){
+                        let podaci = JSON.parse(JSON.stringify(data));
+
+                        let mapiraniPodaci = podaci.map(function (podatak){
+                            return `<option value="${podatak.clanId}">${podatak.imePrezime}</option>`
+                        })
+
+                        $("#radnikIzmena").html(mapiraniPodaci);
+                    }
+                })
+            }
+
+            function unesi(){
+                $.ajax({
+                    url: 'unesiRadnika.php',
+                    method: 'POST',
+                    data: {
+                        imePrezime: $("#imePrezime").val(),
+                        datumRodjenja: $("#datumRodjenja").val(),
+                        brojTelefona: $("#brojTelefona").val(),
+                        ocena: $("#ocena").val(),
+                        tim: $("#tim").val(),
+                        level: $("#level").val()
+                    },
+                    success: function (data){
+                        alert(data);
+                        pretrazi();
+                        popuniSelectRadnika();
+                        popuniKarticeClanovima();
+                    }
+                })
+            }
+
+            function izmeni(){
+                $.ajax({
+                    url: 'izmeniRadnika.php',
+                    method: 'POST',
+                    data: {
+                        radnik: $("#radnikIzmena").val(),
+                        ocena: $("#ocenaIzmena").val()
+                    },
+                    success: function (data){
+                        alert(data);
+                        pretrazi();
+                        popuniKarticeClanovima();
+                    }
+                })
+            }
+
+
             $(document).ready(function (){
                 popuniKarticeClanovima();
+                pretrazi();
+                popuniSelectTimova();
+                popuniSelectLevela();
+                popuniSelectRadnika();
             })
 
         </script>
